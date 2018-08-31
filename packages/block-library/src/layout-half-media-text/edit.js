@@ -29,6 +29,8 @@ const ALLOWED_BLOCKS = [ 'core/button', 'core/paragraph', 'core/heading', 'core/
 const TEMPLATE = [
 	[ 'core/paragraph', { fontSize: 'large', placeholder: 'Content...' } ],
 ];
+const MAX_MEDIA_WIDTH = 900;
+export const DEFAULT_MEDIA_WIDTH = 350;
 
 class ImageEdit extends Component {
 	constructor() {
@@ -38,25 +40,32 @@ class ImageEdit extends Component {
 	}
 
 	onSelectMedia( media ) {
-		const { setAttributes } = this.props;
+		const { attributes, setAttributes } = this.props;
+		const { mediaWidth } = attributes;
+
+		const newMediaWidth = mediaWidth === DEFAULT_MEDIA_WIDTH ?
+			Math.min( media.width, MAX_MEDIA_WIDTH ) :
+			undefined;
+
 		setAttributes( {
 			mediaAlt: media.alt,
 			mediaId: media.id,
 			mediaType: media.type,
 			mediaUrl: media.url,
+			mediaWidth: newMediaWidth,
 		} );
 	}
 
 	renderMediaArea() {
 		const { attributes, setAttributes } = this.props;
-		const { mediaAlt, mediaId, mediaPosition, mediaType, mediaUrl, width } = attributes;
+		const { mediaAlt, mediaId, mediaPosition, mediaType, mediaUrl, mediaWidth } = attributes;
 		const handleClasses = {
 			left: 'block-library-half-media__resize-handler',
 			right: 'block-library-half-media__resize-handler',
 		};
 		const onResizeStop = ( event, direction, elt, delta ) => {
 			setAttributes( {
-				width: parseInt( width + delta.width, 10 ),
+				mediaWidth: parseInt( mediaWidth + delta.width, 10 ),
 			} );
 		};
 		const enablePositions = {
@@ -66,8 +75,9 @@ class ImageEdit extends Component {
 		return (
 			<ResizableBox
 				className="block-library-half-media__resizer"
-				size={ { width } }
-				minWidth="100"
+				size={ { width: mediaWidth } }
+				minWidth="10"
+				maxWidth={ MAX_MEDIA_WIDTH }
 				handleClasses={ handleClasses }
 				enable={ enablePositions }
 				onResizeStop={ onResizeStop }
@@ -84,8 +94,9 @@ class ImageEdit extends Component {
 
 	render() {
 		const { attributes, backgroundColor, setAttributes, setBackgroundColor } = this.props;
+		const { mediaPosition } = attributes;
 		const className = classnames( 'wp-block-half-media', {
-			'has-media-on-the-right': 'right' === attributes.mediaPosition,
+			'has-media-on-the-right': 'right' === mediaPosition,
 			[ backgroundColor.class ]: backgroundColor.class,
 		} );
 		const style = {
@@ -116,7 +127,7 @@ class ImageEdit extends Component {
 					<BlockAlignmentToolbar
 						controls={ MEDIA_POSITIONS }
 						value={ attributes.mediaPosition }
-						onChange={ ( mediaPosition ) => setAttributes( { mediaPosition } ) }
+						onChange={ ( newMediaPosition ) => setAttributes( { mediaPosition: newMediaPosition } ) }
 					/>
 				</BlockControls>
 			</Fragment>
