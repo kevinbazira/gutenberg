@@ -1400,15 +1400,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		$max_upload_size = 0;
 	}
 
-	//	Return URL of fullscreen mode.
-	$referer                    = wp_get_referer();
-	$excluded_referer_basenames = array( 'post.php', 'wp-login.php' );
-	if ( $referer && ! in_array( basename( parse_url( $referer, PHP_URL_PATH ) ), $excluded_referer_basenames, true ) ) {
-		$return_url = $referer;
-	} else {
-		$return_url = home_url( '/' );
-	}
-
 	$editor_settings = array(
 		'alignWide'           => $align_wide || ! empty( $gutenberg_theme_support[0]['wide-images'] ), // Backcompat. Use `align-wide` outside of `gutenberg` array.
 		'availableTemplates'  => $available_templates,
@@ -1420,8 +1411,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'isRTL'               => is_rtl(),
 		'autosaveInterval'    => 10,
 		'maxUploadFileSize'   => $max_upload_size,
-		'allowedMimeTypes'    => get_allowed_mime_types(),
-		'returnURL'           => $return_url
+		'allowedMimeTypes'    => get_allowed_mime_types()
 	);
 
 	$post_autosave = get_autosave_newer_than_post_save( $post );
